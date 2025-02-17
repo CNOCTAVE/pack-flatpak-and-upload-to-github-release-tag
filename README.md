@@ -1,6 +1,8 @@
 <div align="center">
 
-# Flatpak GitHub Actions
+# Pack Flatpak and Upload to Github Release Tag
+
+Fork of [flatpak/flatpak-github-actions](https://github.com/flatpak/flatpak-github-actions) to pack Flatpak and upload to Github release tag.
 
 Build and deploy your Flatpak application using GitHub Actions
 
