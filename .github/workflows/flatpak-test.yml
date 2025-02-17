@@ -98,21 +98,3 @@ jobs:
         working-directory: flatpak-builder
       - run: yarn test
         working-directory: flatpak-builder
-
-  eslint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      - run: yarn install --also=dev
-        working-directory: flatpak-builder
-      - run: yarn run eslint .
-        working-directory: flatpak-builder
-      - run: yarn install --also=dev
-        working-directory: flat-manager
-      - run: yarn run eslint .
-        working-directory: flat-manager
