@@ -9,5 +9,3 @@ RUN flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-rep
 RUN flatpak remote-add --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
 
 RUN flatpak install flathub org.flatpak.Builder -y
-
-ADD --chmod=755 https://raw.githubusercontent.com/flatpak/flat-manager/b07fe8652357ce16d9625f72f9acceaca94d860a/flat-manager-client /usr/bin

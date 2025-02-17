@@ -10,7 +10,7 @@ const { spawn } = require('child_process')
 
 // The various paths to cache
 const CACHE_PATH = [
-  '.flatpak-builder'
+  '.pack-flatpak-and-upload-to-github-release-tag'
 ]
 
 /**
@@ -68,7 +68,7 @@ class Configuration {
     if (!this._cacheKey) {
       try {
         if (!this._manifestHash) { this._manifestHash = (await computeHash(this.manifestPath)).substring(0, 20) }
-        return `flatpak-builder-${this._manifestHash}-${this.arch}`
+        return `pack-flatpak-and-upload-to-github-release-tag-${this._manifestHash}-${this.arch}`
       } catch (err) {
         core.setFailed(`Fail to create create cache key based on manifest hash: ${err}`)
       }
@@ -355,7 +355,7 @@ const prepareBuild = async (config) => {
       [...CACHE_PATH], // TODO: drop once https://github.com/actions/toolkit/pull/1378 is merged
       `${cacheKey}`,
       [
-        'flatpak-builder-',
+        'pack-flatpak-and-upload-to-github-release-tag-',
         'flatpak-'
       ]
     )

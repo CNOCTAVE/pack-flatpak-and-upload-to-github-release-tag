@@ -1,6 +1,6 @@
-name: "Flatpak Builder"
-description: "Build and create a bundle from a Flatpak manifest"
-author: "Bilal Elmoussaoui"
+name: "Pack Flatpak and Upload to Github Release Tag"
+description: "Pack Flatpak and Upload to Github Release Tag"
+author: "CNOCTAVE"
 branding:
   icon: "package"
   color: "blue"
@@ -41,7 +41,7 @@ inputs:
     required: false
   cache:
     description: >
-      Toggles caching the flatpak-builder directory.
+      Toggles caching the pack-flatpak-and-upload-to-github-release-tag directory.
       Possible values: true, enabled, yes, y. Or something else to disable it.
     default: "true"
     required: false
@@ -54,7 +54,7 @@ inputs:
   cache-key:
     description: >
       Defines the cache-key to use.
-      Defaults to flatpak-builder-${sha256(manifestPath)}
+      Defaults to pack-flatpak-and-upload-to-github-release-tag-${sha256(manifestPath)}
     required: false
   branch:
     description: The flatpak branch.

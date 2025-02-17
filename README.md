@@ -8,8 +8,6 @@ Build and deploy your Flatpak application using GitHub Actions
 
 <img src="https://github.com/flatpak/flatpak/raw/main/flatpak.png?raw=true" alt="Flatpak logo" />
 
-![CI](https://github.com/flatpak/flatpak-github-actions/workflows/CI/badge.svg)
-
 </div>
 
 ## How to use
@@ -33,11 +31,11 @@ jobs:
       options: --privileged
     steps:
     - uses: actions/checkout@v4
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+    - uses: CNOCTAVE/pack-flatpak-and-upload-to-github-release-tag@v1
       with:
         bundle: palette.flatpak
         manifest-path: org.gnome.zbrown.Palette.yml
-        cache-key: flatpak-builder-${{ github.sha }}
+        cache-key: pack-flatpak-and-upload-to-github-release-tag-${{ github.sha }}
 ```
 
 #### Inputs
@@ -52,9 +50,9 @@ jobs:
 | `repository-url` | The repository url, used to fetch the runtime when the user download the Flatpak bundle or when building the application  | Optional | `https://flathub.org/repo/flathub.flatpakrepo` |
 | `run-tests` | Enable/Disable running tests. This overrides the `flatpak-builder` option of the same name, which invokes `make check` or `ninja test`. Network and X11 access is enabled, with a display server provided by `xvfb-run`.  | Optional | `false` |
 | `branch` | The default flatpak branch  | Optional | `master` |
-| `cache` | Enable/Disable caching `.flatpak-builder` directory | Optional | `true` |
+| `cache` | Enable/Disable caching `.pack-flatpak-and-upload-to-github-release-tag` directory | Optional | `true` |
 | `restore-cache` | Enable/Disable cache restoring. If caching is enabled. | Optional | `true` |
-| `cache-key` | Specifies the cache key. CPU arch is automatically added, so there is no need to add it to the cache key. | Optional | `flatpak-builder-${sha256(manifestPath)}` |
+| `cache-key` | Specifies the cache key. CPU arch is automatically added, so there is no need to add it to the cache key. | Optional | `pack-flatpak-and-upload-to-github-release-tag-${sha256(manifestPath)}` |
 | `arch` | Specifies the CPU architecture to build for | Optional | `x86_64` |
 | `mirror-screenshots-url` | Specifies the URL to mirror screenshots | Optional | - |
 | `gpg-sign` | The key to sign the package | Optional | - |
@@ -99,11 +97,11 @@ jobs:
       uses: docker/setup-qemu-action@v2
       with:
         platforms: arm64
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+    - uses: CNOCTAVE/pack-flatpak-and-upload-to-github-release-tag@v1
       with:
         bundle: palette.flatpak
         manifest-path: org.gnome.zbrown.Palette.yml
-        cache-key: flatpak-builder-${{ github.sha }}
+        cache-key: pack-flatpak-and-upload-to-github-release-tag-${{ github.sha }}
         arch: ${{ matrix.arch }}
         # if you want to upload Flatpak bundle to a release tag e.g. 1.2.3
         github-tag: 1.2.3
@@ -151,88 +149,3 @@ In the example below, the manifest is located at `/build-aux/flatpak/org.gnome.z
     ]
 }
 ```
-
-### Deployment stage
-
-If you want to deploy the successfully built Flatpak application to a remote repository
-
-```yaml
-on:
-  push:
-    branches: [main]
-name: Deploy
-jobs:
-  flatpak:
-    name: "Flatpak"
-    runs-on: ubuntu-latest
-    container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-47
-      options: --privileged
-    steps:
-    - uses: actions/checkout@v4
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-      name: "Build"
-      with:
-        bundle: palette.flatpak
-        manifest-path: org.gnome.zbrown.Palette.yml
-        cache-key: flatpak-builder-${{ github.sha }}
-    - uses: flatpak/flatpak-github-actions/flat-manager@v6
-      name: "Deploy"
-      with:
-        repository: elementary
-        flat-manager-url: https://flatpak-api.elementary.io
-        token: some_very_hidden_token
-        end-of-life: "The application has been renamed to..."
-        end-of-life-rebase: "org.zbrown.Palette"
-```
-
-#### Inputs
-
-| Name | Description | Required | Default |
-| ---     | ----------- | ----------- |----|
-| `repository` | The repository to push the build into  | Required | - |
-| `flat-manager-url` | The flat-manager remote URL  | Required | - |
-| `token` | A flat-manager token  | Required | - |
-| `end-of-life` | Reason for end of life  | Optional | - |
-| `end-of-life-rebase` | The new app-id  | Optional | - |
-| `build-log-url` | URL to Flatpak build log | Optional | - |
-| `verbose` | Enable verbosity | Optional | `false` |
-
-### Docker Image
-
-The Docker image used for the action consists of 2 parts: The base image, based on Fedora and which can be found
-[here](./Dockerfile), and the specific image of the runtime you choose, which is generated through
-[this](.github/workflows/docker.yml) GitHub Actions workflow.
-
-You can specify the specific runtime you need to use through the image tags:
-
-| Runtime         | Version | Tag                 | Example                                                          |
-| --------------- | ------- | ------------------- | ---------------------------------------------------------------- |
-| Freedesktop SDK | 20.08   | `freedesktop-20.08` | `image: bilelmoussaoui/flatpak-github-actions:freedesktop-20.08` |
-| Freedesktop SDK | 21.08   | `freedesktop-21.08` | `image: bilelmoussaoui/flatpak-github-actions:freedesktop-21.08` |
-| Freedesktop SDK | 22.08   | `freedesktop-22.08` | `image: bilelmoussaoui/flatpak-github-actions:freedesktop-22.08` |
-| Freedesktop SDK | 23.08   | `freedesktop-23.08` | `image: bilelmoussaoui/flatpak-github-actions:freedesktop-23.08` |
-| Freedesktop SDK | 24.08   | `freedesktop-24.08` | `image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08` |
-| GNOME           | 3.38    | `gnome-3.38`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-3.38`        |
-| GNOME           | 40    | `gnome-40`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-40`        |
-| GNOME           | 41    | `gnome-41`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-41`        |
-| GNOME           | 42    | `gnome-42`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-42`        |
-| GNOME           | 43    | `gnome-43`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-43`        |
-| GNOME           | 44    | `gnome-44`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-44`        |
-| GNOME           | 45    | `gnome-45`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-45`        |
-| GNOME           | 46    | `gnome-46`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-46`        |
-| GNOME           | 47    | `gnome-47`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-47`        |
-| GNOME           | master    | `gnome-nightly`        | `image: bilelmoussaoui/flatpak-github-actions:gnome-nightly`        |
-| KDE             | 5.15    | `kde-5.15`          | `image: bilelmoussaoui/flatpak-github-actions:kde-5.15`          |
-| KDE             | 5.15-21.08    | `kde-5.15-21.08`          | `image: bilelmoussaoui/flatpak-github-actions:kde-5.15-21.08`          |
-| KDE             | 5.15-22.08    | `kde-5.15-22.08`          | `image: bilelmoussaoui/flatpak-github-actions:kde-5.15-22.08`          |
-| KDE             | 5.15-23.08    | `kde-5.15-23.08`          | `image: bilelmoussaoui/flatpak-github-actions:kde-5.15-23.08`          |
-| KDE             | 5.15-24.08    | `kde-5.15-24.08`          | `image: bilelmoussaoui/flatpak-github-actions:kde-5.15-24.08`          |
-| KDE             | 6.2     | `kde-6.2`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.2`          |
-| KDE             | 6.3     | `kde-6.3`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.3`          |
-| KDE             | 6.4     | `kde-6.4`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.4`          |
-| KDE             | 6.5     | `kde-6.5`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.5`          |
-| KDE             | 6.6     | `kde-6.6`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.6`          |
-| KDE             | 6.7     | `kde-6.7`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.7`          |
-| KDE             | 6.8     | `kde-6.8`          | `image: bilelmoussaoui/flatpak-github-actions:kde-6.8`          |
-| elementary BaseApp             | juno    | `juno`          | `image: bilelmoussaoui/flatpak-github-actions:elementary-juno`          |

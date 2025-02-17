@@ -1,5 +1,5 @@
 {
-  "name": "flatpak-builder",
+  "name": "pack-flatpak-and-upload-to-github-release-tag",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
